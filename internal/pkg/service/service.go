@@ -64,11 +64,16 @@ func StartWebServer(data *Data) error {
 	return gracehttp.Serve(e.Server)
 }
 
+var promMdlw *prometheus.Prometheus
+
+func init() {
+	promMdlw = prometheus.NewPrometheus("get_text", nil)
+}
+
 func initRoutes(data *Data) *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.Logger())
-	p := prometheus.NewPrometheus("get_text", nil)
-	p.Use(e)
+	promMdlw.Use(e)
 
 	e.POST("/text", convert(data))
 	e.GET("/live", live(data))
@@ -175,6 +180,7 @@ func live(data *Data) func(echo.Context) error {
 
 func getNewFile(file string) string {
 	f := filepath.Base(file)
+	f = strings.TrimSuffix(f, filepath.Ext(f))
 	d := filepath.Dir(file)
-	return filepath.Join(d, fmt.Sprintf("%s.txt", f))
+	return filepath.Join(d, fmt.Sprintf("%s_out.txt", f))
 }
