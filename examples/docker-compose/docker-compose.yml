@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  get-text:
+    image: airenas/get-text:${VERSION}
+    ports:
+      - "${PORT}:8000"
+    # restart: unless-stopped
+
+ 
